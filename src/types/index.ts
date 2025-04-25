@@ -44,7 +44,7 @@ export interface RiskFactor {
 
 export interface MetricItem {
   label: string;
-  value: string | number;
+  value: string | number | React.ReactNode; // Allow React elements
   change?: number;
   status?: 'positive' | 'negative' | 'neutral';
 }
