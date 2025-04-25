@@ -24,26 +24,7 @@ const Dashboard: React.FC = () => {
     { label: 'Medium Risk Found', value: scanHistory.filter(a => a.riskScore >= 50 && a.riskScore < 75).length }
   ];
   
-  const scamTrendsData: ChartData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Phishing',
-        data: [12, 19, 15, 22, 35, 40],
-        borderColor: '#EF4444', // Red
-      },
-      {
-        label: 'Scam Tokens',
-        data: [8, 15, 17, 19, 30, 25],
-        borderColor: '#F59E0B', // Amber
-      },
-      {
-        label: 'Honeypots',
-        data: [5, 10, 8, 15, 12, 18],
-        borderColor: '#8B5CF6', // Purple
-      }
-    ]
-  };
+ 
   
   const recentlyScanned = scanHistory.slice(0, 5);
   
@@ -95,17 +76,7 @@ const Dashboard: React.FC = () => {
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Scam Trends Chart */}
-        <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-medium text-white">Scam Trends (Last 6 Months)</h3>
-            <TrendingUp className="text-blue-400" />
-          </div>
-          
-          <div className="h-64">
-            <LineChart data={scamTrendsData} height={240} />
-          </div>
-        </div>
+       
         
         {/* Average Risk Score */}
         <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 flex flex-col items-center justify-center">
