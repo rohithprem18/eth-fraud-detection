@@ -1,11 +1,9 @@
 import React from 'react';
-import { Activity, AlertTriangle, DollarSign, Users, ShieldAlert, TrendingUp } from 'lucide-react';
+import { Activity, AlertTriangle, Users, ShieldAlert } from 'lucide-react';
 import { useEthereum } from '../context/EthereumContext';
 import MetricsCard from '../components/MetricsCard';
 import RiskScoreGauge from '../components/RiskScoreGauge';
-import LineChart from '../components/LineChart';
-import TransactionList from '../components/TransactionList';
-import { ChartData, MetricItem } from '../types';
+import { MetricItem } from '../types';
 
 const Dashboard: React.FC = () => {
   const { scanHistory, watchlist } = useEthereum();
@@ -69,9 +67,15 @@ const Dashboard: React.FC = () => {
             ))}
           </div>
           
-          <button className="w-full mt-4 py-2 text-sm text-blue-400 hover:text-blue-300 transition">
-            View All Threats
-          </button>
+          <a
+  href="https://ethprotector.netlify.app/"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="block w-full mt-4 py-2 text-center text-sm text-blue-400 hover:text-blue-300 transition"
+>
+  View All Threats
+</a>
+
         </div>
       </div>
       
