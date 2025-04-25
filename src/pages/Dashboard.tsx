@@ -35,16 +35,8 @@ const Dashboard: React.FC = () => {
   
   // Sample data for demonstration
   const networkMetrics: MetricItem[] = [
-    { 
-      label: 'Ethereum', 
-      value: <img src="src\pages\image.png" className="w-12 h-12 object-contain" alt="Ethereum Logo" /> 
-    },
-    { 
-      label: 'ETH Price', 
-      value: ethPrice, 
-      change: 2.4, 
-      status: 'positive' 
-    }
+    { label: 'ETH Price', value: ethPrice, change: 2.4, status: 'positive' }, 
+    
   ];
   
   const detectionMetrics: MetricItem[] = [
