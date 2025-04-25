@@ -1,0 +1,204 @@
+import React from 'react';
+import { Activity, AlertTriangle, DollarSign, Users, ShieldAlert, TrendingUp } from 'lucide-react';
+import { useEthereum } from '../context/EthereumContext';
+import MetricsCard from '../components/MetricsCard';
+import RiskScoreGauge from '../components/RiskScoreGauge';
+import LineChart from '../components/LineChart';
+import TransactionList from '../components/TransactionList';
+import { ChartData, MetricItem } from '../types';
+
+const Dashboard: React.FC = () => {
+  const { scanHistory, watchlist } = useEthereum();
+  
+  // Sample data for demonstration
+  const networkMetrics: MetricItem[] = [
+    { label: 'ETH Price', value: '$4,120.35', change: 2.4, status: 'positive' },
+    { label: 'Gas (Gwei)', value: '45', change: -12.5, status: 'positive' },
+    { label: 'Network Usage', value: '68%', change: 5.2, status: 'negative' }
+  ];
+  
+  const detectionMetrics: MetricItem[] = [
+    { label: 'Addresses Scanned', value: scanHistory.length },
+    { label: 'Addresses Watched', value: watchlist.length },
+    { label: 'High Risk Found', value: scanHistory.filter(a => a.riskScore >= 75).length },
+    { label: 'Medium Risk Found', value: scanHistory.filter(a => a.riskScore >= 50 && a.riskScore < 75).length }
+  ];
+  
+  const scamTrendsData: ChartData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [
+      {
+        label: 'Phishing',
+        data: [12, 19, 15, 22, 35, 40],
+        borderColor: '#EF4444', // Red
+      },
+      {
+        label: 'Scam Tokens',
+        data: [8, 15, 17, 19, 30, 25],
+        borderColor: '#F59E0B', // Amber
+      },
+      {
+        label: 'Honeypots',
+        data: [5, 10, 8, 15, 12, 18],
+        borderColor: '#8B5CF6', // Purple
+      }
+    ]
+  };
+  
+  const recentlyScanned = scanHistory.slice(0, 5);
+  
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Network Status */}
+        <MetricsCard 
+          title="Network Status" 
+          metrics={networkMetrics} 
+          icon={<Activity />} 
+        />
+        
+        {/* Detection Statistics */}
+        <MetricsCard 
+          title="Detection Statistics" 
+          metrics={detectionMetrics} 
+          icon={<ShieldAlert />} 
+        />
+        
+        {/* Latest Threats */}
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-medium text-white">Latest Threats</h3>
+            <AlertTriangle className="text-red-500" />
+          </div>
+          
+          <div className="space-y-3">
+            {[
+              { name: 'USDT Drainer', type: 'Phishing Contract', date: '2h ago' },
+              { name: 'Fake Airdrop', type: 'Scam Token', date: '5h ago' },
+              { name: 'ETH2x Multiplier', type: 'Ponzi Scheme', date: '1d ago' }
+            ].map((threat, i) => (
+              <div key={i} className="flex items-center p-2 rounded hover:bg-gray-700 transition cursor-pointer">
+                <div className="w-2 h-2 rounded-full bg-red-500 mr-3"></div>
+                <div className="flex-1">
+                  <h4 className="text-white text-sm font-medium">{threat.name}</h4>
+                  <p className="text-gray-400 text-xs">{threat.type}</p>
+                </div>
+                <span className="text-gray-400 text-xs">{threat.date}</span>
+              </div>
+            ))}
+          </div>
+          
+          <button className="w-full mt-4 py-2 text-sm text-blue-400 hover:text-blue-300 transition">
+            View All Threats
+          </button>
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Scam Trends Chart */}
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-medium text-white">Scam Trends (Last 6 Months)</h3>
+            <TrendingUp className="text-blue-400" />
+          </div>
+          
+          <div className="h-64">
+            <LineChart data={scamTrendsData} height={240} />
+          </div>
+        </div>
+        
+        {/* Average Risk Score */}
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-5 flex flex-col items-center justify-center">
+          <h3 className="font-medium text-white mb-3">Average Risk Score</h3>
+          
+          <div className="flex justify-center">
+            <RiskScoreGauge 
+              score={Math.round(
+                scanHistory.reduce((acc, addr) => acc + addr.riskScore, 0) / 
+                (scanHistory.length || 1)
+              )} 
+            />
+          </div>
+          
+          <p className="text-center text-sm text-gray-400 mt-2">
+            Based on {scanHistory.length} addresses scanned
+          </p>
+        </div>
+      </div>
+      
+      {/* Recently Scanned Addresses */}
+      <div className="bg-gray-800 rounded-lg border border-gray-700 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-medium text-white">Recently Scanned Addresses</h3>
+          <Users className="text-blue-400" />
+        </div>
+        
+        {recentlyScanned.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="text-left text-sm text-gray-400 border-b border-gray-700">
+                  <th className="pb-3 pr-6">Address</th>
+                  <th className="pb-3 pr-6">Last Checked</th>
+                  <th className="pb-3 pr-6">Type</th>
+                  <th className="pb-3 pr-6">Risk Score</th>
+                  <th className="pb-3">Category</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentlyScanned.map((address, i) => (
+                  <tr key={i} className="border-b border-gray-700 hover:bg-gray-750 transition">
+                    <td className="py-3 pr-6">
+                      <a 
+                        href={`/transactions/${address.address}`}
+                        className="text-blue-400 hover:underline font-mono text-sm"
+                      >
+                        {address.address.slice(0, 6)}...{address.address.slice(-4)}
+                      </a>
+                    </td>
+                    <td className="py-3 pr-6 text-sm">
+                      {new Date(address.lastChecked).toLocaleString()}
+                    </td>
+                    <td className="py-3 pr-6 text-sm">
+                      {address.isContract ? 'Contract' : 'EOA'}
+                    </td>
+                    <td className="py-3 pr-6">
+                      <div className="flex items-center">
+                        <div className="w-16 bg-gray-700 h-2 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full rounded-full ${
+                              address.riskScore >= 75 ? 'bg-red-500' :
+                              address.riskScore >= 50 ? 'bg-orange-500' :
+                              address.riskScore >= 25 ? 'bg-yellow-500' :
+                              'bg-green-500'
+                            }`}
+                            style={{ width: `${address.riskScore}%` }}
+                          ></div>
+                        </div>
+                        <span className="ml-2 text-sm">{address.riskScore}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 text-sm">
+                      {address.prediction.category || 'Unknown'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-center py-8 text-gray-400">
+            <p>No addresses have been scanned yet.</p>
+            <p className="mt-2">
+              <a href="/scanner" className="text-blue-400 hover:underline">
+                Scan an address
+              </a>
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
