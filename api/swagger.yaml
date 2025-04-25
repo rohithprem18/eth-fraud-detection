@@ -1,0 +1,172 @@
+openapi: 3.0.0
+info:
+  title: ETH Shield API
+  version: 1.0.0
+  description: API for Ethereum fraud detection and analysis
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  /api/scan:
+    post:
+      summary: Scan an Ethereum address for fraud
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                address:
+                  type: string
+                  description: Ethereum address to scan
+                  example: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+      responses:
+        '200':
+          description: Successful scan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  address:
+                    $ref: '#/components/schemas/Address'
+                  transactions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  prediction:
+                    $ref: '#/components/schemas/FraudPrediction'
+        '400':
+          description: Invalid address
+        '500':
+          description: Internal server error
+
+  /api/transactions/{address}:
+    get:
+      summary: Get transactions for an Ethereum address
+      parameters:
+        - name: address
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Ethereum address
+          example: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid address
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    Address:
+      type: object
+      properties:
+        address:
+          type: string
+        balance:
+          type: string
+        txCount:
+          type: integer
+        firstTx:
+          type: string
+        lastTx:
+          type: string
+        isContract:
+          type: boolean
+        riskScore:
+          type: number
+        lastChecked:
+          type: string
+        prediction:
+          $ref: '#/components/schemas/FraudPrediction'
+
+    Transaction:
+      type: object
+      properties:
+        hash:
+          type: string
+        blockNumber:
+          type: integer
+        timeStamp:
+          type: string
+        from:
+          type: string
+        to:
+          type: string
+        value:
+          type: string
+        gas:
+          type: string
+        gasPrice:
+          type: string
+        gasUsed:
+          type: string
+        method:
+          type: string
+        isError:
+          type: string
+        isSuspicious:
+          type: boolean
+        suspiciousReason:
+          type: string
+
+    FraudPrediction:
+      type: object
+      properties:
+        riskScore:
+          type: number
+        fraudProbability:
+          type: number
+        isFraudulent:
+          type: boolean
+        confidence:
+          type: number
+        riskFactors:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskFactor'
+        category:
+          type: string
+
+    RiskFactor:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        score:
+          type: number
+        importance:
+          type: number
